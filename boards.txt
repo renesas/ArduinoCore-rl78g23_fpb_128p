@@ -1,0 +1,32 @@
+# See: http://code.google.com/p/arduino/wiki/Platforms
+
+menu.cpu=Processor
+
+## RL78/G23 Fast Prototyping Board 128P Board Description
+g23-fpb-128p.name=RL78-G23-128p Fast Prototyping Board
+g23-fpb-128p.upload.tool=rl78flash
+g23-fpb-128p.upload.protocol=rl78
+g23-fpb-128p.upload.maximum_size=786432
+g23-fpb-128p.upload.maximum_data_size=49152
+g23-fpb-128p.upload.speed=115200
+
+g23-fpb-128p.bootloader.tool=
+g23-fpb-128p.bootloader.low_fuses=
+g23-fpb-128p.bootloader.high_fuses=
+g23-fpb-128p.bootloader.extended_fuses=
+g23-fpb-128p.bootloader.unlock_bits=
+g23-fpb-128p.bootloader.lock_bits=
+g23-fpb-128p.bootloader.file=
+
+g23-fpb-128p.build.mcu=rl78
+g23-fpb-128p.build.f_cpu=32000000L
+g23-fpb-128p.build.board=RL78G23_128P_FPB
+g23-fpb-128p.build.core=rl78g23_128p
+########## TSSR changed ##########
+g23-fpb-128p.build.ldscript=variants/g23-fpb-128p/linker_scripts/gcc/linker_script.ld
+########## TSSR changed ##########
+g23-fpb-128p.build.variant=g23-fpb-128p
+g23-fpb-128p.build.extra_flags=-DGRPROT
+
+##############################################################
+#<EOF>
