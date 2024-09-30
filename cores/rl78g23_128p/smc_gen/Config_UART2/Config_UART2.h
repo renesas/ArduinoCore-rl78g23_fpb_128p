@@ -60,6 +60,5 @@ void R_Config_UART2_Loopback_Enable(void);
 void R_Config_UART2_Loopback_Disable(void);
 void R_Config_UART2_Create_UserInit(void);
 /* Start user code for function. Do not edit comment generated here */
-void r_Config_UART2_interrupt_receive(void);
 /* End user code. Do not edit comment generated here */
 #endif

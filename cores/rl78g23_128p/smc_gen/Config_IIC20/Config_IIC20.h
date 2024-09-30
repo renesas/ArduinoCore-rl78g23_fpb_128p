@@ -30,6 +30,7 @@
 Includes
 ***********************************************************************************************************************/
 #include "r_cg_sau.h"
+#include "r_cg_iica.h"
 
 #ifndef CFG_Config_IIC20_H
 #define CFG_Config_IIC20_H

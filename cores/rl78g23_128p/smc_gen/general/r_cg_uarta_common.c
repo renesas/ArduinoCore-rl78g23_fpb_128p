@@ -35,6 +35,7 @@ Pragma directive
 Includes
 ***********************************************************************************************************************/
 #include "r_cg_macrodriver.h"
+#include "Config_UARTA0.h"
 #include "Config_UARTA1.h"
 #include "r_cg_uarta_common.h"
 /* Start user code for include. Do not edit comment generated here */
@@ -57,7 +58,7 @@ void R_UARTA_Create(void)
 {
     UTAEN = 1U;    /* supply UARTA0/UARTA1 clock */
     /* Set UARTA0/UARTA1 settings */
-//    R_Config_UARTA0_Create();
+    R_Config_UARTA0_Create();
     R_Config_UARTA1_Create();
 }
 

@@ -110,5 +110,13 @@ extern arduino::TwoWire Wire1;
 extern arduino::TwoWire Wire2;
 #endif  /* defined(IIC_CHANNEL2) && IIC_CHANNEL2 == 2 */
 
+#if     defined(IIC_CHANNEL3) && IIC_CHANNEL3 == 3
+extern arduino::TwoWire Wire3;
+#endif  /* defined(IIC_CHANNEL3) && IIC_CHANNEL3 == 3 */
+
+#if     defined(IIC_CHANNEL4) && IIC_CHANNEL4 == 4
+extern arduino::TwoWire Wire4;
+#endif  /* defined(IIC_CHANNEL4) && IIC_CHANNEL4 == 4 */
+
 #endif /* TwoWire_h */
 

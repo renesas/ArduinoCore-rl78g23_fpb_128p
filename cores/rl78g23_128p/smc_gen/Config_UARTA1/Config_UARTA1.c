@@ -66,9 +66,9 @@ void R_Config_UARTA1_Create(void)
     URIF1 = 0U;    /* clear INTUR1 interrupt flag */
     UREMK1 = 1U;    /* disable INTURE1 interrupt */
     UREIF1 = 0U;    /* clear INTURE1 interrupt flag */
-    /* Set INTUT1 low priority */
+    /* Set INTUT1 level 2 priority */
     UTPR11 = 1U;
-    UTPR01 = 1U;
+    UTPR01 = 0U;
     /* Set INTUR1 low priority */
     URPR11 = 1U;
     URPR01 = 1U;

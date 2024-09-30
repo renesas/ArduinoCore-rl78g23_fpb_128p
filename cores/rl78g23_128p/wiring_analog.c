@@ -1,31 +1,3 @@
-/*
- wiring_analog.c - analog input and output
- Part of Arduino - http://www.arduino.cc/
-
- Copyright (c) 2005-2006 David A. Mellis
-
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version. 
-
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
-
- You should have received a copy of the GNU Lesser General
- Public License along with this library; if not, write to the
- Free Software Foundation, Inc., 59 Temple Place, Suite 330,
- Boston, MA  02111-1307  USA
-
- Modified 28 September 2010 by Mark Sproul
-
- $Id: wiring.c 248 2007-02-03 15:36:30Z mellis $
- */
-/*
- * Modified  4 Mar  2017 by Yuuki Okamiya for RL78/G13
- */
 #include "wiring_private.h"
 #include "wiring_variant.h"
 #include "pins_variant.h"
@@ -61,7 +33,6 @@ static int _analogRead(uint8_t u8ADS);
 static uint16_t _analogDuty(int val, uint16_t frequency);
 static uint16_t _analogFrequency (uint8_t pin, uint32_t u32Hz);
 
-volatile SwPwm g_SwPwm[NUM_SWPWM_PINS] = { { 0, 0, 0, 0, 0, 0 }, };
 bool g_u8AnalogReadAvailableTable[NUM_ANALOG_INPUTS] = { 0 };
 bool g_u8AnalogWriteAvailableTable[NUM_DIGITAL_PINS] = {};
 
@@ -417,7 +388,7 @@ static void _analogPinRead (uint8_t pin)
     int8_t pin_index;
     pin_index = (int8_t)pin - ANALOG_PIN_START_NUMBER;
 //  if pin_index is not within the accessable range do nothing
-    if(pin_index <0 || pin_index >= NUM_ANALOG_INPUTS)
+    if ((pin_index < 0) || (pin_index >= NUM_ANALOG_INPUTS))
     {
         return;
     }

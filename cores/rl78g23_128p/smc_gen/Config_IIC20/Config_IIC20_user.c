@@ -44,6 +44,7 @@ Includes
 Global variables and functions
 ***********************************************************************************************************************/
 extern volatile uint8_t g_iic20_master_status_flag;      /* iic20 start flag for send address check */
+extern volatile uint8_t g_iica20_master_status_flag;      /* iic20 master flag */
 extern volatile uint8_t * gp_iic20_tx_address;           /* iic20 send data pointer by master mode */
 extern volatile uint16_t g_iic20_tx_cnt;               /* iic20 send data size by master mode */
 extern volatile uint8_t * gp_iic20_rx_address;           /* iic20 receive data pointer by master mode */
@@ -61,7 +62,7 @@ extern uint16_t g_iic20_rx_len;                       /* iic20 receive data leng
 void R_Config_IIC20_Create_UserInit(void)
 {
     /* Start user code for user init. Do not edit comment generated here */
-    POM1 |= 0x30U;
+//    POM1 |= 0x30U;
     /* End user code. Do not edit comment generated here */
 }
 
@@ -74,8 +75,8 @@ void R_Config_IIC20_Create_UserInit(void)
 static void r_Config_IIC20_callback_master_sendend(void)
 {
     /* Start user code for r_Config_IIC20_callback_master_sendend. Do not edit comment generated here */
-//    g_iic20_master_status_flag |= _04_SAU_IIC_SENDED_ADDRESS_FLAG;
     R_Config_IIC20_StopCondition();
+    g_iica20_master_status_flag = _40_IICA_DATA_COMPLETE;
     /* End user code. Do not edit comment generated here */
 }
 
@@ -89,6 +90,7 @@ static void r_Config_IIC20_callback_master_receiveend(void)
 {
     /* Start user code for r_Config_IIC20_callback_master_receiveend. Do not edit comment generated here */
     R_Config_IIC20_StopCondition();
+    g_iica20_master_status_flag = _40_IICA_DATA_COMPLETE;
     /* End user code. Do not edit comment generated here */
 }
 
@@ -103,6 +105,7 @@ static void r_Config_IIC20_callback_master_error(MD_STATUS flag)
 {
     /* Start user code for r_Config_IIC20_callback_master_error. Do not edit comment generated here */
     R_Config_IIC20_StopCondition();
+    g_iica20_master_status_flag = (g_iica20_master_status_flag & 0xF0U) | (flag & 0x0FU);
     /* End user code. Do not edit comment generated here */
 }
 
@@ -132,12 +135,14 @@ void r_Config_IIC20_interrupt(void)
     }
     else if((0x0001U == (SSR10 & _0001_SAU_OVERRUN_ERROR)) && (0U != g_iic20_tx_cnt))
     {
+    	g_iica20_master_status_flag |= _80_IICA_ADDRESS_COMPLETE;
         SIR10 |= _0001_SAU_SIRMN_OVCTMN;    /* clear overrun error detection flag */
         R_Config_IIC20_StopCondition();
         r_Config_IIC20_callback_master_error(MD_OVERRUN);
     }
     else
     {
+    	g_iica20_master_status_flag |= _80_IICA_ADDRESS_COMPLETE;
         /* Control for master send */
         if (1U == (g_iic20_master_status_flag & _01_SAU_IIC_SEND_FLAG))
         {

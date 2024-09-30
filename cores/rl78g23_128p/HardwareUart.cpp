@@ -1,35 +1,3 @@
-/*
-  HardwareUart.cpp - Hardware serial library for Wiring
-  Copyright (c) 2006 Nicholas Zambetti.  All right reserved.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-  Modified 23 November 2006 by David A. Mellis
-  Modified 28 September 2010 by Mark Sproul
-  Modified 14 August 2012 by Alarus
-  Modified 7 March 2013 by masahiko.nagata.cj@renesas.com
-  Modified 30 June 2013 by yuuki.okamiya.yn@renesas.com
-  Modified 13 Mar 2018 by yuuki.okamiya.yn@renesas.com
-*/
-/*
- * FIXME: Temporary: Debug Display Mode
- *    Remove this macro definition and macro use later,
- *    if `Serial.write()` is fixed to work.
- */
-/* #define DEBUGDISP_MODE */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -48,6 +16,7 @@ extern "C" {
     #include "pins_variant.h"
 }
 
+
 extern "C" {
 #if ( UART_CHANNEL == 0 )
     #include "Config_UART0.h"
@@ -60,10 +29,13 @@ extern "C" {
 #endif /* ( UART2_CHANNEL == 2 ) */
 #if ( UART3_CHANNEL == 3 )
     #include "Config_UART1.h"
-#endif /* ( UART3_CHANNEL == 2 ) */
+#endif /* ( UART3_CHANNEL == 3 ) */
 #if ( UART4_CHANNEL == 4 )
     #include "Config_UART3.h"
-#endif /* ( UART4_CHANNEL == 2 ) */
+#endif /* ( UART4_CHANNEL == 4 ) */
+#if ( UART5_CHANNEL == 5 )
+    #include "Config_UARTA0.h"
+#endif /* ( UART5_CHANNEL == 5 ) */
 
 
 };
@@ -536,6 +508,16 @@ void HardwareUart::begin(unsigned long baud, uint16_t config, int rx_buf, int tx
             R_Config_UART3_Receive((uint8_t * const)&receive_buffer,1);
 #endif /* UART2_CHANNEL==2 */
             break;
+        case 5:
+#if (UART5_CHANNEL==5)
+            R_Config_UARTA0_Create();
+            Set_Baudrate(baud);
+            Set_SerialPort(SERIAL_TXD5,SERIAL_RXD5);
+            Set_Config(config);
+            R_Config_UARTA0_Start();
+            R_Config_UARTA0_Receive((uint8_t * const)&receive_buffer,1);
+#endif /* UART1_CHANNEL==1 */
+            break;
         default :
             /* Do nothing */
             break;
@@ -576,6 +558,11 @@ void HardwareUart::end()
 #if (UART4_CHANNEL == 4 )
             R_Config_UART3_Stop();
 #endif /* (UART2_CHANNEL == 2 ) */
+            break;
+        case 5:
+#if (UART5_CHANNEL == 5 )
+            R_Config_UARTA0_Stop();
+#endif /* (UART5_CHANNEL == 5 ) */
             break;
     }
 #if defined(FEW_RAM_MODEL) && (FEW_RAM_MODEL == 1)
@@ -684,8 +671,8 @@ void HardwareUart::flush()
 #if ( UART1_CHANNEL == 1 )
     else if (_urt_channel == 1)
     {
-        while (SSR02 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
-        {  /* check TSF02 and BFF02 */
+        while ( ASISA1 & _20_UARTA_DATA_EXIST_IN_TXBA )
+        {  /* check TXBFA1 */
             ;
         }
     }
@@ -696,14 +683,14 @@ void HardwareUart::flush()
         while (SSR10 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
         {  /* check TSF10 and BFF10 */
           ;
-       }
+        }
     }
 #endif /* ( UART2_CHANNEL == 2 ) */
 #if ( UART3_CHANNEL == 3 )
     else if (_urt_channel == 3)
     {
         while (SSR02 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
-        {  /* check TSF10 and BFF10 */
+        {  /* check TSF02 and BFF02 */
             ;
         }
     }
@@ -712,11 +699,20 @@ void HardwareUart::flush()
     else if (_urt_channel == 4)
     {
         while (SSR12 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
-        {  /* check TSF10 and BFF10 */
+        {  /* check TSF12 and BFF12 */
             ;
         }
     }
-#endif /* ( UART2_CHANNEL == 2 ) */
+#endif /* ( UART4_CHANNEL == 4 ) */
+#if ( UART5_CHANNEL == 5 )
+    else if (_urt_channel == 5)
+    {
+        while ( ASISA0 & _20_UARTA_DATA_EXIST_IN_TXBA )
+        {  /* check TXBFA0 */
+            ;
+        }
+    }
+#endif /* ( UART5_CHANNEL == 5 ) */
 
     while(_tx_buf_size-1!=availableForWrite())
     {
@@ -785,7 +781,7 @@ size_t HardwareUart::UART_Send(uint8_t c)
                 break;
             case 3:
 #if ( UART3_CHANNEL == 3 )
-                if((SSR02 & _0020_SAU_VALID_STORED) != 0)/*BFF10*/
+                if((SSR02 & _0020_SAU_VALID_STORED) != 0)/*BFF02*/
                 {
                     return 0;
                 }
@@ -794,12 +790,21 @@ size_t HardwareUart::UART_Send(uint8_t c)
                 break;
             case 4:
 #if ( UART4_CHANNEL == 4 )
-                if((SSR12 & _0020_SAU_VALID_STORED) != 0)/*BFF10*/
+                if((SSR12 & _0020_SAU_VALID_STORED) != 0)/*BFF12*/
                 {
                     return 0;
                 }
                 err = R_Config_UART3_Send((uint8_t * const)&c,1);
 #endif /* ( UART4_CHANNEL == 4 ) */
+                break;
+            case 5:
+#if ( UART5_CHANNEL == 5 )
+                if((ASISA0 & _20_UARTA_DATA_EXIST_IN_TXBA) != 0)
+                {
+                    return 0;
+                }
+                err = R_Config_UARTA0_Send((uint8_t * const)&c,1);
+#endif /* ( UART5_CHANNEL == 5 ) */
                 break;
         }
     }
@@ -827,8 +832,8 @@ size_t HardwareUart::UART_Send(uint8_t c)
                 {
                     case 0:
 #if ( UART_CHANNEL == 0 )
-                        while((SSR00 & _0020_SAU_VALID_STORED) != 0) /*BFF00*/
-                        {
+                        while (SSR00 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
+                        {  /* check TSF00 and BFF00 */
                             ;
                         }
                         STIF0 = 0;
@@ -840,23 +845,23 @@ size_t HardwareUart::UART_Send(uint8_t c)
                         {
                             ;
                         }
-                        STIF1 = 0;
+                        UTIF1 = 0;
 #endif /* ( UART1_CHANNEL == 1 ) */
                         break;
                     case 2:
 #if ( UART2_CHANNEL == 2 )
-                        while((SSR10 & _0020_SAU_VALID_STORED) != 0) /*BFF10*/
-                        {
+                        while (SSR10 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
+                        {  /* check TSF10 and BFF10 */
                             ;
                         }
 /* clear UARTA_TX_ENDI0 interrupt flag */
-//                        STIF2 = 0;
+                        STIF2 = 0;
 #endif /* ( UART2_CHANNEL == 2 ) */
                         break;
                     case 3:
 #if ( UART3_CHANNEL == 3 )
-                        while((SSR02 & _0020_SAU_VALID_STORED) != 0)/*BFF10*/
-                        {
+                        while (SSR02 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
+                        {  /* check TSF02 and BFF02 */
                             ;
                         }
                         STIF1 = 0;
@@ -864,12 +869,21 @@ size_t HardwareUart::UART_Send(uint8_t c)
                         break;
                     case 4:
 #if ( UART4_CHANNEL == 4 )
-                        while((SSR12 & _0020_SAU_VALID_STORED) != 0)/*BFF10*/
-                        {
+                        while (SSR12 & (_0040_SAU_UNDER_EXECUTE | _0020_SAU_VALID_STORED))
+                        {  /* check TSF12 and BFF12 */
                             ;
                         }
                         STIF3 = 0;
 #endif /* ( UART4_CHANNEL == 4 ) */
+                        break;
+                    case 5:
+#if ( UART5_CHANNEL == 5 )
+                        while((ASISA0 & _20_UARTA_DATA_EXIST_IN_TXBA) != 0)
+                        {
+                            ;
+                        }
+                        UTIF0 = 0;
+#endif /* ( UART5_CHANNEL == 5 ) */
                         break;
                 }
                 Set_Char_Serial_from_buf(_urt_channel);
@@ -986,6 +1000,11 @@ void HardwareUart::load_char(void){
                 R_Config_UART3_Send((uint8_t * const)&send_buffer,1);
 #endif /* (UART4_CHANNEL == 4) */
                 break;
+            case 5:
+#if (UART5_CHANNEL == 5)
+                R_Config_UARTA0_Send((uint8_t * const)&send_buffer,1);
+#endif /* (UART5_CHANNEL == 5) */
+                break;
         }
     }
 }
@@ -1030,6 +1049,11 @@ void HardwareUart::store_char(void){
 #if (UART4_CHANNEL == 4)
             R_Config_UART3_Receive((uint8_t * const)&receive_buffer,1);
 #endif /* (UART4_CHANNEL == 4) */
+            break;
+        case 5:
+#if (UART5_CHANNEL == 5)
+            R_Config_UARTA0_Receive((uint8_t * const)&receive_buffer,1);
+#endif /* (UART5_CHANNEL == 5) */
             break;
     }
 }
@@ -1117,7 +1141,7 @@ void HardwareUart::Set_Baudrate(unsigned long baudrate)
                 break;
         }
     }
-    else
+    else if (( _urt_channel == 1 ) || ( _urt_channel == 5 ) )
     {
         uint16_t tmp_brgc ;
         uint16_t brgc ;
@@ -1133,10 +1157,25 @@ void HardwareUart::Set_Baudrate(unsigned long baudrate)
             peri_clk = (peri_clk >> 1);
             tmp_brgc  = (uint16_t)(((peri_clk/baudrate) >> 1) -1) ;
         }
-        brgc = (uint16_t)(peri_clk/baudrate);
-        UTA0CK |= _20_UARTA_FSEL_SELECT_FIHP;
-        UTA1CK = _80_UARTA_CLKA1_OUTPUT_ENABLE | prs;
-        BRGCA1 =  (uint8_t)(tmp_brgc & 0x00FF) ;
+
+        switch (_urt_channel)
+        {
+            case 1:
+#if ( UART1_CHANNEL == 1 )
+                brgc = (uint16_t)(peri_clk/baudrate);
+                UTA0CK |= _20_UARTA_FSEL_SELECT_FIHP;
+                UTA1CK = _80_UARTA_CLKA1_OUTPUT_ENABLE | prs;
+                BRGCA1 =  (uint8_t)(tmp_brgc & 0x00FF) ;
+#endif /* ( UART1_CHANNEL == 1 ) */
+                break;
+            case 5:
+#if ( UART5_CHANNEL == 5 )
+                brgc = (uint16_t)(peri_clk/baudrate);
+                UTA0CK = _80_UARTA_CLKA0_OUTPUT_ENABLE | _20_UARTA_FSEL_SELECT_FIHP | prs;
+                BRGCA0 =  (uint8_t)(tmp_brgc & 0x00FF) ;
+#endif /* ( UART5_CHANNEL == 5 ) */
+                break;
+        }
     }
 }
 
@@ -1308,12 +1347,12 @@ void HardwareUart::Set_Config(uint16_t config )
 
             SCR02 = SCR02data;
             SCR03 = SCR03data;
-#endif /* ( UART1_CHANNEL == 1 ) */
+#endif /* ( UART3_CHANNEL == 3 ) */
             break;
         }
         case 4:  //UART3
         {
-#if ( UART3_CHANNEL == 3 )
+#if ( UART4_CHANNEL == 4 )
             unsigned short SCR12data=_8000_SAU_TRANSMISSION| _0000_SAU_INTSRE_MASK |_0004_SAU_SCRMN_INITIALVALUE |_0080_SAU_LSB |converted_config;
             unsigned short SCR13data=_4000_SAU_RECEPTION| _0400_SAU_INTSRE_ENABLE |_0004_SAU_SCRMN_INITIALVALUE |_0080_SAU_LSB |converted_config;
             /* SLCmn1: 0 SLCmn0: 1 when receiving XXXXXXXXXX01XXXX*/
@@ -1322,7 +1361,15 @@ void HardwareUart::Set_Config(uint16_t config )
 
             SCR12 = SCR12data;
             SCR13 = SCR13data;
-#endif /* ( UART1_CHANNEL == 1 ) */
+#endif /* ( UART4_CHANNEL == 4 ) */
+            break;
+        }
+        case 5:  // UARTA0
+        {
+#if ( UART5_CHANNEL == 5 )
+            unsigned short ASIMA01data = _02_UARTA_DIRECTION_LSB | _00_UARTA_DATA_NORMAL | converted_config;
+            ASIMA01 = (unsigned char)ASIMA01data;
+#endif /* ( UART5_CHANNEL == 5 ) */
             break;
         }
     }
@@ -1490,7 +1537,12 @@ void Set_Char_Serial_to_buf(uint8_t chn)
         case 4:
 #if (UART4_CHANNEL == 4)
             Serial4.store_char();
-#endif /* (UART2_CHANNEL == 2) */
+#endif /* (UART4_CHANNEL == 4) */
+            break;
+        case 5:
+#if (UART5_CHANNEL == 5)
+            Serial5.store_char();
+#endif /* (UART5_CHANNEL == 5) */
             break;
     }
 }
@@ -1531,6 +1583,11 @@ void Set_Char_Serial_from_buf(uint8_t chn)
             Serial4.load_char();
 #endif /* (UART4_CHANNEL == 4) */
             break;
+        case 5:
+#if (UART5_CHANNEL == 5)
+            Serial5.load_char();
+#endif /* (UART5_CHANNEL == 5) */
+            break;
     }
 }
 
@@ -1553,5 +1610,8 @@ void Set_Char_Serial_from_buf(uint8_t chn)
 #if ( UART4_CHANNEL == 4 )
     HardwareUart Serial4(4);
 #endif /* ( UART4_CHANNEL == 4 ) */
+#if ( UART5_CHANNEL == 5 )
+    HardwareUart Serial5(5);
+#endif /* ( UART5_CHANNEL == 5 ) */
 
 

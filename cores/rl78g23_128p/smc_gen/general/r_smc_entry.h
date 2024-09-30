@@ -45,6 +45,7 @@ Includes
 #include "Config_UART1.h"
 #include "Config_UART2.h"
 #include "Config_UART3.h"
+#include "Config_UARTA0.h"
 #include "Config_UARTA1.h"
 #include "Config_CSI11.h"
 #include "Config_CSI30.h"

@@ -25,8 +25,24 @@ extern "C" {
   extern volatile uint16_t g_iic20_rx_len;
   extern volatile uint16_t g_iic20_rx_cnt;
   extern volatile uint16_t g_iic20_tx_cnt;
-  extern volatile uint8_t  g_iic20_master_status_flag;
+  extern volatile uint8_t  g_iica20_master_status_flag;
 #endif  /* defined(IIC_CHANNEL2) && IIC_CHANNEL2 == 2 */
+
+  #if     defined(IIC_CHANNEL3) && IIC_CHANNEL3 == 3
+  #include "Config_IIC01.h"
+  extern volatile uint16_t g_iic01_rx_len;
+  extern volatile uint16_t g_iic01_rx_cnt;
+  extern volatile uint16_t g_iic01_tx_cnt;
+  extern volatile uint8_t  g_iica01_master_status_flag;
+#endif  /* defined(IIC_CHANNEL3) && IIC_CHANNEL3 == 3 */
+
+#if     defined(IIC_CHANNEL4) && IIC_CHANNEL4 == 4
+  #include "Config_IIC11.h"
+  extern volatile uint16_t g_iic11_rx_len;
+  extern volatile uint16_t g_iic11_rx_cnt;
+  extern volatile uint16_t g_iic11_tx_cnt;
+  extern volatile uint8_t  g_iica11_master_status_flag;
+#endif  /* defined(IIC_CHANNEL4) && IIC_CHANNEL4 == 4 */
 
 }
 
@@ -88,9 +104,41 @@ IICA_Impl::IICA_Impl(uint8_t ch) {
     rx_len                  = &g_iic20_rx_len;
     rx_cnt                  = &g_iic20_rx_cnt;
     tx_cnt                  = &g_iic20_tx_cnt;
-    master_status_flag      = &g_iic20_master_status_flag;
+    master_status_flag      = &g_iica20_master_status_flag;
     break;
 #endif  /* defined(IIC_CHANNEL2) && IIC_CHANNEL2 == 2 */
+
+#if     defined(IIC_CHANNEL3) && IIC_CHANNEL3 == 3
+  case 3:
+    Master_Create_          = R_Config_IIC01_Create;
+    Master_Stop_            = R_Config_IIC01_Stop;
+    Master_StopCondition_   = R_Config_IIC01_StopCondition;
+    Master_Create_UserInit_ = R_Config_IIC01_Create_UserInit;
+    Master_Send_            = R_Config_IIC01_Master_Send;
+    Master_Receive_         = R_Config_IIC01_Master_Receive;
+    Master_SetClock_        = R_Config_IIC01_Master_SetClock;
+    rx_len                  = &g_iic01_rx_len;
+    rx_cnt                  = &g_iic01_rx_cnt;
+    tx_cnt                  = &g_iic01_tx_cnt;
+    master_status_flag      = &g_iica01_master_status_flag;
+    break;
+#endif  /* defined(IIC_CHANNEL3) && IIC_CHANNEL3 == 3 */
+
+#if     defined(IIC_CHANNEL4) && IIC_CHANNEL4 == 4
+  case 4:
+    Master_Create_          = R_Config_IIC11_Create;
+    Master_Stop_            = R_Config_IIC11_Stop;
+    Master_StopCondition_   = R_Config_IIC11_StopCondition;
+    Master_Create_UserInit_ = R_Config_IIC11_Create_UserInit;
+    Master_Send_            = R_Config_IIC11_Master_Send;
+    Master_Receive_         = R_Config_IIC11_Master_Receive;
+    Master_SetClock_        = R_Config_IIC11_Master_SetClock;
+    rx_len                  = &g_iic11_rx_len;
+    rx_cnt                  = &g_iic11_rx_cnt;
+    tx_cnt                  = &g_iic11_tx_cnt;
+    master_status_flag      = &g_iica11_master_status_flag;
+    break;
+#endif  /* defined(IIC_CHANNEL4) && IIC_CHANNEL4 == 4 */
 
 
   default:
@@ -125,6 +173,7 @@ MD_STATUS IICA_Impl::Master_StatusFlagWait(void) const {
   unsigned long wait = 0;
   while (true) {
     auto stat   = getMasterStatusFlag();
+// 20240828 deleted
     if ((stat & 0x0FU) != 0x00U) {
       ret = stat;
       break;
@@ -144,7 +193,6 @@ MD_STATUS IICA_Impl::Master_StatusFlagWait(void) const {
     delay(STATUS_WAIT_INTERVAL);
     wait += STATUS_WAIT_INTERVAL;
   }
-
   return ret;
 }
 
@@ -245,6 +293,7 @@ uint8_t   IICA_Impl::Master_Send           (uint8_t adr, uint8_t * const tx_buf,
 uint8_t   IICA_Impl::Master_Receive        (uint8_t adr, uint8_t * const rx_buf, uint16_t rx_num, bool sendStop) const {
   MD_STATUS ret;
   MD_STATUS status = MD_OK;
+  uint8_t ans;
   if (Master_Receive_ == nullptr) {
     ret = MD_ERROR;
   } else {
@@ -259,6 +308,7 @@ uint8_t   IICA_Impl::Master_Receive        (uint8_t adr, uint8_t * const rx_buf,
   }
 
   return ret == MD_OK && (status & 0x0FU) == 0x00U ? (uint8_t)getRxLen() : 0;
+
 }
 
 /**********************************************************************************************************************

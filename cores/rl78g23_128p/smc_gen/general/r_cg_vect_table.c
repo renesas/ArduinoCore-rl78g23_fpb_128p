@@ -148,8 +148,8 @@ INT_WDTI,
 /*
  * INT_CSI11/INT_IIC11/INT_SR1 (0x26)
  */
-    r_Config_UART1_interrupt_receive,
-
+//    r_Config_UART1_interrupt_receive,
+    r_Config_IIC11_UART1_interrupt_switching,
 /*
  * INT_SRE1/INT_TM03H (0x28)
  */
@@ -163,7 +163,12 @@ INT_WDTI,
 /*
  * INT_CSI01/INT_IIC01/INT_SR0 (0x2C)
  */
-    r_Config_UART0_interrupt_receive,
+#if defined(CSI_CHANNEL6) || ((defined(UART3_CHANNEL) && UART3_CHANNEL == 3 ))
+    r_Config_IIC01_UART0_interrupt_switching,
+#else
+    INT_CSI01,
+#endif
+//    r_Config_UART0_interrupt_receive,
 
 /*
  * INT_TM01 (0x2E)
@@ -340,12 +345,12 @@ INT_WDTI,
 /*
  * INT_UT0 (0x6A)
  */
-    INT_UT0,
+    r_Config_UARTA0_interrupt_send,
 
 /*
  * INT_UR0 (0x6C)
  */
-    INT_UR0,
+    r_Config_UARTA0_interrupt_receive,
 
 /*
  * INT_UT1 (0x6E)

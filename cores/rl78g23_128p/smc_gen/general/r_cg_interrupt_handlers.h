@@ -123,7 +123,8 @@ void INT_ST1(void) __attribute__ ((interrupt));
  * INT_CSI11/INT_IIC11/INT_SR1 (0x26)
  */
 //void INT_SR1(void) __attribute__ ((interrupt));
-void r_Config_UART1_interrupt_receive(void) __attribute__ ((interrupt));
+// void r_Config_UART1_interrupt_receive(void) __attribute__ ((interrupt));
+void r_Config_IIC11_UART1_interrupt_switching(void) __attribute__ ((interrupt));
 
 /*
  * INT_SRE1/INT_TM03H (0x28)
@@ -141,7 +142,9 @@ void r_Config_IICA0_interrupt(void) __attribute__ ((interrupt));
 /*
  * INT_CSI01/INT_IIC01/INT_SR0 (0x2C)
  */
-void r_Config_UART0_interrupt_receive(void) __attribute__ ((interrupt));
+void r_Config_IIC01_UART0_interrupt_switching(void) __attribute__ ((interrupt));
+//void r_Config_UART0_interrupt_receive(void) __attribute__ ((interrupt));
+
 /*
  * INT_TM01 (0x2E)
  */
@@ -270,6 +273,7 @@ void r_Config_INTC_intp11_interrupt(void) __attribute__ ((interrupt));
  * INT_TM10/INT_URE0 (0x58)
  */
 void r_Config_TAU1_0_PWM_interrupt (void) __attribute__ ((interrupt));
+// void r_Config_UARTA0_interrupt_error (void) __attribute__ ((interrupt));
 
 /*
  * INT_TM11/INT_URE1 (0x5A)
@@ -315,12 +319,12 @@ void INT_REMC(void) __attribute__ ((interrupt));
 /*
  * INT_UT0 (0x6A)
  */
-void INT_UT0(void) __attribute__ ((interrupt));
+void r_Config_UARTA0_interrupt_send (void) __attribute__ ((interrupt));
 
 /*
  * INT_UR0 (0x6C)
  */
-void INT_UR0(void) __attribute__ ((interrupt));
+void r_Config_UARTA0_interrupt_receive (void) __attribute__ ((interrupt));
 
 /*
  * INT_UT1 (0x6E)

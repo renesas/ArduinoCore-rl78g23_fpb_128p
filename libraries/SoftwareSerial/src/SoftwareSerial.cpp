@@ -1,41 +1,3 @@
-/*
-SoftwareSerial.cpp (formerly NewSoftSerial.cpp) - 
-Multi-instance software serial library for Arduino/Wiring
--- Interrupt-driven receive and other improvements by ladyada
-   (http://ladyada.net)
--- Tuning, circular buffer, derivation from class Print/Stream,
-   multi-instance support, porting to 8MHz processors,
-   various optimizations, PROGMEM delay tables, inverse logic and 
-   direct port writing by Mikal Hart (http://www.arduiniana.org)
--- Pin change interrupt macros by Paul Stoffregen (http://www.pjrc.com)
--- 20MHz processor support by Garrett Mace (http://www.macetech.com)
--- ATmega1280/2560 support by Brett Hagman (http://www.roguerobotics.com/)
-
-This library is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with this library; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-
-The latest version of this library can always be found at
-http://arduiniana.org.
-*/
-/* Aug 25th 2017: Modified by Yuuki Okamiya for RL78 */
-
-// When set, _DEBUG co-opts pins 11 and 13 for debugging with an
-// oscilloscope or logic analyzer.  Beware: it also slightly modifies
-// the bit times, so don't rely on it too much at high baud rates
-#define _DEBUG 0
-#define _DEBUG_PIN1 11
-#define _DEBUG_PIN2 13
 // 
 // Includes
 // 
@@ -52,129 +14,7 @@ extern "C" {
 extern bool g_u8AnalogReadAvailableTable[NUM_ANALOG_INPUTS];
 
 volatile int tempAXvalue=0;
-#define digitalPinToBitMask(P) ( pgm_read_byte( digital_pin_to_bit_mask_PGM + (P) ) )
-const uint8_t PROGMEM digital_pin_to_bit_mask_PGM[] = {
-        DIGITAL_PIN_MASK_0,
-        DIGITAL_PIN_MASK_1,
-        DIGITAL_PIN_MASK_2,
-        DIGITAL_PIN_MASK_3,
-        DIGITAL_PIN_MASK_4,
-        DIGITAL_PIN_MASK_5,
-        DIGITAL_PIN_MASK_6,
-        DIGITAL_PIN_MASK_7,
-        DIGITAL_PIN_MASK_8,
-        DIGITAL_PIN_MASK_9,
-        DIGITAL_PIN_MASK_10,
-        DIGITAL_PIN_MASK_11,
-        DIGITAL_PIN_MASK_12,
-        DIGITAL_PIN_MASK_13,
-        DIGITAL_PIN_MASK_14,
-        DIGITAL_PIN_MASK_15,
-        DIGITAL_PIN_MASK_16,
-        DIGITAL_PIN_MASK_17,
-        DIGITAL_PIN_MASK_18,
-        DIGITAL_PIN_MASK_19,
-        DIGITAL_PIN_MASK_20,
-        DIGITAL_PIN_MASK_21,
-        DIGITAL_PIN_MASK_22,
-        DIGITAL_PIN_MASK_23,
-        DIGITAL_PIN_MASK_24,
-        DIGITAL_PIN_MASK_25,
-        DIGITAL_PIN_MASK_26,
-        DIGITAL_PIN_MASK_27,
-        DIGITAL_PIN_MASK_28,
-        DIGITAL_PIN_MASK_29,
-        DIGITAL_PIN_MASK_30,
-        DIGITAL_PIN_MASK_31,
-        DIGITAL_PIN_MASK_32,
-        DIGITAL_PIN_MASK_33,
-        DIGITAL_PIN_MASK_34,
-        DIGITAL_PIN_MASK_35,
-        DIGITAL_PIN_MASK_36,
-        DIGITAL_PIN_MASK_37,
-        DIGITAL_PIN_MASK_38,
-        DIGITAL_PIN_MASK_39,
-        DIGITAL_PIN_MASK_40,
-        DIGITAL_PIN_MASK_41,
-        DIGITAL_PIN_MASK_42,
-        DIGITAL_PIN_MASK_43,
-        DIGITAL_PIN_MASK_44,
-        DIGITAL_PIN_MASK_45,
-        DIGITAL_PIN_MASK_46,
-        DIGITAL_PIN_MASK_47,
-        DIGITAL_PIN_MASK_48,
-        DIGITAL_PIN_MASK_49,
-        DIGITAL_PIN_MASK_50,
-        DIGITAL_PIN_MASK_51,
-        DIGITAL_PIN_MASK_52,
-        DIGITAL_PIN_MASK_53,
-        DIGITAL_PIN_MASK_54,
-        DIGITAL_PIN_MASK_55,
-        DIGITAL_PIN_MASK_56,
-        DIGITAL_PIN_MASK_57,
-        DIGITAL_PIN_MASK_58,
-        DIGITAL_PIN_MASK_59,
-        DIGITAL_PIN_MASK_60,
-        DIGITAL_PIN_MASK_61,
-        DIGITAL_PIN_MASK_62,
-        DIGITAL_PIN_MASK_63,
-        DIGITAL_PIN_MASK_64,
-        DIGITAL_PIN_MASK_65,
-        DIGITAL_PIN_MASK_66,
-        DIGITAL_PIN_MASK_67,
-        DIGITAL_PIN_MASK_68,
-        DIGITAL_PIN_MASK_69,
-        DIGITAL_PIN_MASK_70,
-        DIGITAL_PIN_MASK_71,
-        DIGITAL_PIN_MASK_72,
-        DIGITAL_PIN_MASK_73,
-        DIGITAL_PIN_MASK_74,
-        DIGITAL_PIN_MASK_75,
-        DIGITAL_PIN_MASK_76,
-        DIGITAL_PIN_MASK_77,
-        DIGITAL_PIN_MASK_78,
-        DIGITAL_PIN_MASK_79,
-        DIGITAL_PIN_MASK_80,
-        DIGITAL_PIN_MASK_81,
-        DIGITAL_PIN_MASK_82,
-        DIGITAL_PIN_MASK_83,
-        DIGITAL_PIN_MASK_84,
-        DIGITAL_PIN_MASK_85,
-        DIGITAL_PIN_MASK_86,
-        DIGITAL_PIN_MASK_87,
-        DIGITAL_PIN_MASK_88,
-        DIGITAL_PIN_MASK_89,
-        DIGITAL_PIN_MASK_90,
-        DIGITAL_PIN_MASK_91,
-        DIGITAL_PIN_MASK_92,
-        DIGITAL_PIN_MASK_93,
-        DIGITAL_PIN_MASK_94,
-        DIGITAL_PIN_MASK_95,
-        DIGITAL_PIN_MASK_96,
-        DIGITAL_PIN_MASK_97,
-        DIGITAL_PIN_MASK_98,
-        DIGITAL_PIN_MASK_99,
-        DIGITAL_PIN_MASK_100,
-        DIGITAL_PIN_MASK_100,
-        DIGITAL_PIN_MASK_101,
-        DIGITAL_PIN_MASK_102,
-        DIGITAL_PIN_MASK_103,
-        DIGITAL_PIN_MASK_104,
-        DIGITAL_PIN_MASK_105,
-        DIGITAL_PIN_MASK_106,
-        DIGITAL_PIN_MASK_107,
-        DIGITAL_PIN_MASK_108,
-        DIGITAL_PIN_MASK_109,
-        DIGITAL_PIN_MASK_110,
-        DIGITAL_PIN_MASK_111,
-        DIGITAL_PIN_MASK_112,
-        DIGITAL_PIN_MASK_113,
-        DIGITAL_PIN_MASK_114,
-        DIGITAL_PIN_MASK_115,
-        DIGITAL_PIN_MASK_116,
-        DIGITAL_PIN_MASK_117,
-        DIGITAL_PIN_MASK_118
-};
+
 //
 // Statics
 //
@@ -352,8 +192,6 @@ SoftwareSerial::SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inv
 {
     _transmitPin = transmitPin;
     _receivePin = receivePin;
-    _transmitBitMask = digitalPinToBitMask(transmitPin);
-    _receiveBitMask = digitalPinToBitMask(receivePin);
 
 //    PinTableType* p;
 //    PinTableType pin_tbl;
@@ -368,6 +206,7 @@ SoftwareSerial::SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inv
 
     pp = &pinTablelist[transmitPin];
     p = (__far PinTableType *)*pp;
+    _transmitBitMask = p->mask;
     _transmitPortRegister = p->portRegisterAddr;
     pp = &pinTablelist[receivePin];
     p = (__far PinTableType *)*pp;
@@ -417,50 +256,50 @@ void SoftwareSerial::begin(long speed)
     if (115200L == speed)
     {
         _rx_delay_centering = 0;
-        _rx_delay_firstbit = 30;
-        _rx_delay_intrabit = 30;
-        _rx_delay_stopbit = 30;
-        _tx_delay = 30;
+        _rx_delay_firstbit = 31;
+        _rx_delay_intrabit = 31;
+        _rx_delay_stopbit = 31;
+        _tx_delay = 31;
     }
     else if (57600L == speed)
     {
         _rx_delay_centering = 25;
-        _rx_delay_firstbit = 69;
-        _rx_delay_intrabit = 69;
-        _rx_delay_stopbit = 69;
-        _tx_delay = 69;
+        _rx_delay_firstbit = 71;
+        _rx_delay_intrabit = 71;
+        _rx_delay_stopbit = 71;
+        _tx_delay = 71;
     }
     else if (38400L == speed)
     {
         _rx_delay_centering = 45;
-        _rx_delay_firstbit = 108;
-        _rx_delay_intrabit = 108;
-        _rx_delay_stopbit = 108;
-        _tx_delay = 108;
+        _rx_delay_firstbit = 110;
+        _rx_delay_intrabit = 110;
+        _rx_delay_stopbit = 110;
+        _tx_delay = 110;
     }
     else if (19200L == speed)
     {
         _rx_delay_centering = 110;
-        _rx_delay_firstbit = 227;
-        _rx_delay_intrabit = 227;
-        _rx_delay_stopbit = 227;
-        _tx_delay = 227;
+        _rx_delay_firstbit = 230;
+        _rx_delay_intrabit = 230;
+        _rx_delay_stopbit = 230;
+        _tx_delay = 230;
     }
     else if (9600L == speed)
     {
         _rx_delay_centering = 227;
-        _rx_delay_firstbit = 463;
-        _rx_delay_intrabit = 463;
-        _rx_delay_stopbit = 463;
-        _tx_delay = 463;
+        _rx_delay_firstbit = 468;
+        _rx_delay_intrabit = 468;
+        _rx_delay_stopbit = 468;
+        _tx_delay = 468;
     }
     else if (4800L == speed)
     {
         _rx_delay_centering = 467;
-        _rx_delay_firstbit = 935;
-        _rx_delay_intrabit = 935;
-        _rx_delay_stopbit = 935;
-        _tx_delay = 935;
+        _rx_delay_firstbit = 945;
+        _rx_delay_intrabit = 945;
+        _rx_delay_stopbit = 945;
+        _tx_delay = 945;
     }
 
     Set_SerialPort(_transmitPin,_receivePin);
@@ -591,7 +430,7 @@ void SoftwareSerial::Set_SerialPort(uint8_t txd_pin,uint8_t rxd_pin)
 {
     __far const PinTableType * __far const *pp;
     __far const PinTableType *p;
-    uint8_t pin_index;
+    int8_t pin_index;
 
     /* Set RxD pin */
     //getPinTable(rxd_pin,p);
@@ -605,8 +444,8 @@ void SoftwareSerial::Set_SerialPort(uint8_t txd_pin,uint8_t rxd_pin)
     if (0!=p->pmca){
         *p->portModeControlARegisterAddr &= (unsigned long)~(p->pmca);
 //
-        pin_index = rxd_pin - ANALOG_PIN_START_NUMBER;
-        if(pin_index >=0 && pin_index < NUM_ANALOG_INPUTS)
+        pin_index = (int8_t)rxd_pin - ANALOG_PIN_START_NUMBER;
+        if ((pin_index >= 0) && (pin_index < NUM_ANALOG_INPUTS))
         {
             g_u8AnalogReadAvailableTable[pin_index] = false;
         }
@@ -655,8 +494,8 @@ void SoftwareSerial::Set_SerialPort(uint8_t txd_pin,uint8_t rxd_pin)
     if (0!=p->pmca){
         *p->portModeControlARegisterAddr &= (unsigned long)~(p->pmca);
 //
-        pin_index = txd_pin - ANALOG_PIN_START_NUMBER;
-        if(pin_index >=0 && pin_index < NUM_ANALOG_INPUTS)
+        pin_index = (int8_t)txd_pin - ANALOG_PIN_START_NUMBER;
+        if ((pin_index >= 0) && (pin_index < NUM_ANALOG_INPUTS))
         {
             g_u8AnalogReadAvailableTable[pin_index] = false;
         }

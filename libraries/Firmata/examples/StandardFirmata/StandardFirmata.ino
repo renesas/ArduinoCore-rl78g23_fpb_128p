@@ -148,7 +148,7 @@ void enableI2CPins()
   // is there a faster way to do this? would probaby require importing
   // Arduino.h to get SCL and SDA pins
   for (i = 0; i < TOTAL_PINS; i++) {
-    if (IS_PIN_I2C(i)) {
+    if (IS_PIN_I2C(i) && !((i) == PIN_WIRE_SDA2) && !((i) == PIN_WIRE_SCL2)) {
       // mark pins as i2c so they are ignore in non i2c data requests
       setPinModeCallback(i, PIN_MODE_I2C);
     }
@@ -333,7 +333,7 @@ void setPinModeCallback(byte pin, int mode)
       break;
 #endif
     case PIN_MODE_I2C:
-      if (IS_PIN_I2C(pin)) {
+      if (IS_PIN_I2C(pin) && !((pin) == PIN_WIRE_SDA2) && !((pin) == PIN_WIRE_SCL2)) {
         // mark the pin as i2c
         // the user must call I2C_CONFIG to enable I2C for a device
         Firmata.setPinMode(pin, PIN_MODE_I2C);
@@ -646,7 +646,7 @@ void sysexCallback(byte command, byte argc, byte *argv)
           Firmata.write(PIN_MODE_SERVO);
           Firmata.write(14);
         }
-        if (IS_PIN_I2C(pin)) {
+        if (IS_PIN_I2C(pin) && !((pin) == PIN_WIRE_SDA2) && !((pin) == PIN_WIRE_SCL2)) {
           Firmata.write(PIN_MODE_I2C);
           Firmata.write(1);  // TODO: could assign a number to map to SCL or SDA
         }

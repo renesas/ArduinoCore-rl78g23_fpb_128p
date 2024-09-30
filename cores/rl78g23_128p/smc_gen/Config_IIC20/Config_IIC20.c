@@ -44,6 +44,7 @@ Includes
 Global variables and functions
 ***********************************************************************************************************************/
 volatile uint8_t   g_iic20_master_status_flag;    /* iic20 start flag for send address check */
+volatile uint8_t   g_iica20_master_status_flag;   /* iic20 master flag */
 volatile uint8_t * gp_iic20_tx_address;           /* iic20 send data pointer by master mode */
 volatile uint16_t  g_iic20_tx_cnt;              /* iic20 send data size by master mode */
 volatile uint8_t * gp_iic20_rx_address;           /* iic20 receive data pointer by master mode */
@@ -80,7 +81,6 @@ void R_Config_IIC20_Create(void)
     PMCE1 &= 0xCFU;
     P1 |= 0x30U;
     PM1 &= 0xCFU;
-
     R_Config_IIC20_Create_UserInit();
 }
 
@@ -196,7 +196,7 @@ MD_STATUS R_Config_IIC20_Master_Send(uint8_t adr, uint8_t * const tx_buf, uint16
     IICIF20 = 0U;    /* clear INTIIC20 interrupt flag */
     IICMK20 = 0U;    /* enable INTIIC20 */
     SIO20 = adr;
-
+    g_iica20_master_status_flag = _00_IICA_MASTER_FLAG_CLEAR;
     return (status);
 }
 
@@ -229,7 +229,7 @@ MD_STATUS R_Config_IIC20_Master_Receive(uint8_t adr, uint8_t * const rx_buf, uin
     IICIF20 = 0U;    /* clear INTIIC20 interrupt flag */
     IICMK20 = 0U;    /* enable INTIIC20 */
     SIO20 = adr;
-
+    g_iica20_master_status_flag = _00_IICA_MASTER_FLAG_CLEAR;
     return (status);
 }
 

@@ -1,7 +1,7 @@
 /*
   Software serial multple serial test
   Receives from the hardware serial, sends to software serial.
-  Receives from software serial, sends to hardware se
+  Receives from software serial, sends to hardware serial.
   Only the following pins can be used for RX:
   D7, D9, D61, D66, D67, D68, D69, D87, D89
 */
