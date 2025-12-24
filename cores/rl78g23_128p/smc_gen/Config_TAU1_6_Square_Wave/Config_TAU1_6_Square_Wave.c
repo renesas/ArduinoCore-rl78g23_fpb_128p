@@ -87,8 +87,8 @@ void R_Config_TAU1_6_Square_Wave_Create(void)
 ***********************************************************************************************************************/
 void R_Config_TAU1_6_Square_Wave_Start(void)
 {
-    TMIF16 = 0U;    /* clear INTTM16 interrupt flag */
-    TMMK16 = 0U;    /* enable INTTM16 interrupt */
+//    TMIF16 = 0U;    /* clear INTTM16 interrupt flag */
+//    TMMK16 = 0U;    /* enable INTTM16 interrupt */
     TOE1 |= _0040_TAU_CH6_OUTPUT_ENABLE;
     TS1 |= _0040_TAU_CH6_START_TRG_ON;
 }
@@ -103,9 +103,13 @@ void R_Config_TAU1_6_Square_Wave_Stop(void)
 {
     TT1 |= _0040_TAU_CH6_STOP_TRG_ON;
     TOE1 &= (uint16_t)~_0040_TAU_CH6_OUTPUT_ENABLE;
+
+    /* Output Low */
+    P10 &= 0xDFU;
+    TO1 &= (uint16_t)~_0040_TAU_CH6_OUTPUT_VALUE_1;
     /* Mask channel 6 interrupt */
-    TMMK16 = 1U;    /* disable INTTM16 interrupt */
-    TMIF16 = 0U;    /* clear INTTM16 interrupt flag */
+//    TMMK16 = 1U;    /* disable INTTM16 interrupt */
+//    TMIF16 = 0U;    /* clear INTTM16 interrupt flag */
 }
 
 /* Start user code for adding. Do not edit comment generated here */

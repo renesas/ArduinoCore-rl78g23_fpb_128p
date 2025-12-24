@@ -204,11 +204,11 @@ SoftwareSerial::SoftwareSerial(uint8_t receivePin, uint8_t transmitPin, bool inv
     __far const PinTableType * __far const *pp;
     __far PinTableType* p;
 
-    pp = &pinTablelist[transmitPin];
+    pp = (__far const PinTableType **)&pinTablelist[transmitPin];
     p = (__far PinTableType *)*pp;
     _transmitBitMask = p->mask;
     _transmitPortRegister = p->portRegisterAddr;
-    pp = &pinTablelist[receivePin];
+    pp = (__far const PinTableType **)&pinTablelist[receivePin];
     p = (__far PinTableType *)*pp;
     _receiveBitMask = p->mask;
     _receivePortRegister = p->portRegisterAddr;
@@ -256,50 +256,50 @@ void SoftwareSerial::begin(long speed)
     if (115200L == speed)
     {
         _rx_delay_centering = 0;
-        _rx_delay_firstbit = 31;
-        _rx_delay_intrabit = 31;
-        _rx_delay_stopbit = 31;
-        _tx_delay = 31;
+        _rx_delay_firstbit = 30;
+        _rx_delay_intrabit = 30;
+        _rx_delay_stopbit = 30;
+        _tx_delay = 28;
     }
     else if (57600L == speed)
     {
         _rx_delay_centering = 25;
-        _rx_delay_firstbit = 71;
-        _rx_delay_intrabit = 71;
-        _rx_delay_stopbit = 71;
-        _tx_delay = 71;
+        _rx_delay_firstbit = 69;
+        _rx_delay_intrabit = 69;
+        _rx_delay_stopbit = 69;
+        _tx_delay = 69;
     }
     else if (38400L == speed)
     {
         _rx_delay_centering = 45;
-        _rx_delay_firstbit = 110;
-        _rx_delay_intrabit = 110;
-        _rx_delay_stopbit = 110;
-        _tx_delay = 110;
+        _rx_delay_firstbit = 108;
+        _rx_delay_intrabit = 108;
+        _rx_delay_stopbit = 108;
+        _tx_delay = 108;
     }
     else if (19200L == speed)
     {
         _rx_delay_centering = 110;
-        _rx_delay_firstbit = 230;
-        _rx_delay_intrabit = 230;
-        _rx_delay_stopbit = 230;
-        _tx_delay = 230;
+        _rx_delay_firstbit = 227;
+        _rx_delay_intrabit = 227;
+        _rx_delay_stopbit = 227;
+        _tx_delay = 227;
     }
     else if (9600L == speed)
     {
         _rx_delay_centering = 227;
-        _rx_delay_firstbit = 468;
-        _rx_delay_intrabit = 468;
-        _rx_delay_stopbit = 468;
-        _tx_delay = 468;
+        _rx_delay_firstbit = 463;
+        _rx_delay_intrabit = 463;
+        _rx_delay_stopbit = 463;
+        _tx_delay = 463;
     }
     else if (4800L == speed)
     {
         _rx_delay_centering = 467;
-        _rx_delay_firstbit = 945;
-        _rx_delay_intrabit = 945;
-        _rx_delay_stopbit = 945;
-        _tx_delay = 945;
+        _rx_delay_firstbit = 935;
+        _rx_delay_intrabit = 935;
+        _rx_delay_stopbit = 935;
+        _tx_delay = 935;
     }
 
     Set_SerialPort(_transmitPin,_receivePin);
@@ -434,7 +434,7 @@ void SoftwareSerial::Set_SerialPort(uint8_t txd_pin,uint8_t rxd_pin)
 
     /* Set RxD pin */
     //getPinTable(rxd_pin,p);
-    pp = &pinTablelist[rxd_pin];
+    pp = (__far const PinTableType **)&pinTablelist[rxd_pin];
     p = (__far PinTableType *)*pp;
 
     /* Set PM Register for Input */
@@ -468,7 +468,7 @@ void SoftwareSerial::Set_SerialPort(uint8_t txd_pin,uint8_t rxd_pin)
     }
 
     /* Set TxD pin */
-    pp = &pinTablelist[txd_pin];
+    pp = (__far const PinTableType **)&pinTablelist[txd_pin];
     p = (__far PinTableType *)*pp;
 
     /* Set PMCE Register t */

@@ -117,7 +117,7 @@ SECTIONS
 		/*INPUT_SECTION_FLAGS(SHF_EXECINSTR) *(*_f)*/
 	}>ROM
 
-	.frodata :
+	.frodata : ALIGN(65536)
 	{
 		. = ALIGN(2);
 		__frodata = .;

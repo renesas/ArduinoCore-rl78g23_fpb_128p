@@ -58,7 +58,7 @@ void pinMode(pin_size_t pin, PinMode pinMode)
 
         __far const PinTableType * __far const *pp;
         __far const PinTableType *p;
-        pp = &pinTablelist[pin];
+        pp = (__far const PinTableType **)&pinTablelist[pin];
         p = (__far PinTableType *)*pp;
 
 #ifdef PMPUPIMPOM_CHECK_ENABLE
@@ -228,7 +228,7 @@ void digitalWrite(pin_size_t pin, PinStatus val)
         {
             return;
         }
-        pp = &pinTablelist[pin];
+        pp = (__far const PinTableType **)&pinTablelist[pin];
         p = (__far PinTableType *)*pp;
         /* When Output Mode  */
         if (val == LOW) {
@@ -250,7 +250,7 @@ PinStatus digitalRead(pin_size_t pin){
     if (pin < NUM_DIGITAL_PINS) {
         __far const PinTableType * __far const *pp;
         __far PinTableType * p;
-        pp = &pinTablelist[pin];
+        pp = (__far const PinTableType **)&pinTablelist[pin];
         p = (__far PinTableType *)*pp;
         if (*p->portRegisterAddr & p->mask) {
 
@@ -274,7 +274,7 @@ void DisableDigitalInput(uint8_t pin)
     if (pin < NUM_DIGITAL_PINS) {
         __far const PinTableType * __far const *pp;
         __far PinTableType * p;
-        pp = &pinTablelist[pin];
+        pp = (__far const PinTableType **)&pinTablelist[pin];
         p = (__far PinTableType *)*pp;
 #if defined(G23_FPB)
         if (0 != p->pdidis){    /* can be changed */
@@ -295,7 +295,7 @@ void EnableDigitalInput(uint8_t pin)
     if (pin < NUM_DIGITAL_PINS) {
         __far const PinTableType * __far const *pp;
         __far PinTableType * p;
-        pp = &pinTablelist[pin];
+        pp = (__far const PinTableType **)&pinTablelist[pin];
         p = (__far PinTableType *)*pp;
 #if defined(G23_FPB)
         if (0 != p->pdidis){    /* can be changed */

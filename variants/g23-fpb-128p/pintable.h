@@ -51,6 +51,7 @@ typedef struct {
     /* Add for G23 */
 } PinTableType;
 
+extern __far const PinTableType * __far const pinTablelist[];
 
 #ifdef __cplusplus
 };

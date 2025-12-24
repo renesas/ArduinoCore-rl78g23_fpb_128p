@@ -87,8 +87,8 @@ void R_Config_TAU1_5_Square_Wave_Create(void)
 ***********************************************************************************************************************/
 void R_Config_TAU1_5_Square_Wave_Start(void)
 {
-    TMIF15 = 0U;    /* clear INTTM15 interrupt flag */
-    TMMK15 = 0U;    /* enable INTTM15 interrupt */
+//    TMIF15 = 0U;    /* clear INTTM15 interrupt flag */
+//    TMMK15 = 0U;    /* enable INTTM15 interrupt */
     TOE1 |= _0020_TAU_CH5_OUTPUT_ENABLE;
     TS1 |= _0020_TAU_CH5_START_TRG_ON;
 }
@@ -103,9 +103,13 @@ void R_Config_TAU1_5_Square_Wave_Stop(void)
 {
     TT1 |= _0020_TAU_CH5_STOP_TRG_ON;
     TOE1 &= (uint16_t)~_0020_TAU_CH5_OUTPUT_ENABLE;
+
+    /* Output Low */
+    P10 &= 0xEFU;
+    TO1 &= (uint16_t)~_0020_TAU_CH5_OUTPUT_VALUE_1;
     /* Mask channel 5 interrupt */
-    TMMK15 = 1U;    /* disable INTTM15 interrupt */
-    TMIF15 = 0U;    /* clear INTTM15 interrupt flag */
+//    TMMK15 = 1U;    /* disable INTTM15 interrupt */
+//    TMIF15 = 0U;    /* clear INTTM15 interrupt flag */
 }
 
 /* Start user code for adding. Do not edit comment generated here */

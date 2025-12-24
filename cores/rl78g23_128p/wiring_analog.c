@@ -395,7 +395,7 @@ static void _analogPinRead (uint8_t pin)
     if (g_u8AnalogReadAvailableTable[pin_index] == false) {
         __far const PinTableType * __far const *pp;
         __far PinTableType * p;
-        pp = &pinTablelist[pin];
+        pp = (__far const PinTableType **)&pinTablelist[pin];
         p = (__far PinTableType *)*pp;
 #if defined(G22_FPB) || defined(G23_FPB)
         if (0!=p->pmca)

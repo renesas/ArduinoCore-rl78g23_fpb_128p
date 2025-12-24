@@ -9,7 +9,7 @@ unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout)
     // digitalRead() instead yields much coarser resolution.
     __far const PinTableType * __far const *pp;
 	__far PinTableType *p;
-    pp = &pinTablelist[pin];
+    pp = (__far const PinTableType **)&pinTablelist[pin];
     p = (__far PinTableType *)*pp;
     unsigned long start;
     unsigned long startMicros = micros();

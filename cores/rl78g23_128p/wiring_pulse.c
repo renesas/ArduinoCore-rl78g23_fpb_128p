@@ -31,7 +31,7 @@ uint32_t pulseIn(pin_size_t pin, uint8_t state, uint32_t timeout)
 {
     __far const PinTableType * __far const *pp;
 	__far PinTableType *p;
-    pp = &pinTablelist[pin];
+    pp = (__far const PinTableType **)&pinTablelist[pin];
     p = (__far PinTableType *)*pp;
    // unsigned long start;
    // unsigned long startMicros = micros();

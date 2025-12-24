@@ -88,8 +88,8 @@ void R_Config_TAU1_3_Square_Wave_Create(void)
 ***********************************************************************************************************************/
 void R_Config_TAU1_3_Square_Wave_Start(void)
 {
-    TMIF13 = 0U;    /* clear INTTM13 interrupt flag */
-    TMMK13 = 0U;    /* enable INTTM13 interrupt */
+//    TMIF13 = 0U;    /* clear INTTM13 interrupt flag */
+//    TMMK13 = 0U;    /* enable INTTM13 interrupt */
     TOE1 |= _0008_TAU_CH3_OUTPUT_ENABLE;
     TS1 |= _0008_TAU_CH3_START_TRG_ON;
 }
@@ -104,9 +104,13 @@ void R_Config_TAU1_3_Square_Wave_Stop(void)
 {
     TT1 |= _0008_TAU_CH3_STOP_TRG_ON;
     TOE1 &= (uint16_t)~_0008_TAU_CH3_OUTPUT_ENABLE;
+
+    /* Output Low */
+    P6 &= 0x7FU;
+    TO1 &= (uint16_t)~_0008_TAU_CH3_OUTPUT_VALUE_1;
     /* Mask channel 3 interrupt */
-    TMMK13 = 1U;    /* disable INTTM13 interrupt */
-    TMIF13 = 0U;    /* clear INTTM13 interrupt flag */
+//    TMMK13 = 1U;    /* disable INTTM13 interrupt */
+//    TMIF13 = 0U;    /* clear INTTM13 interrupt flag */
 }
 
 /* Start user code for adding. Do not edit comment generated here */

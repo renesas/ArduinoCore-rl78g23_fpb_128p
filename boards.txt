@@ -18,7 +18,7 @@ g23-fpb-128p.bootloader.unlock_bits=
 g23-fpb-128p.bootloader.lock_bits=
 g23-fpb-128p.bootloader.file=
 
-g23-fpb-128p.build.mcu=rl78
+g23-fpb-128p.build.mcu=R7F100GSN
 g23-fpb-128p.build.f_cpu=32000000L
 g23-fpb-128p.build.board=RL78G23_128P_FPB
 g23-fpb-128p.build.core=rl78g23_128p
